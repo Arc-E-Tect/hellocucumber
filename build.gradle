@@ -17,10 +17,23 @@ plugins {
 }
 
 repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
     mavenCentral()
+}
+
+sourceSets {
+    cucumberTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/cucumberTest/java')
+        }
+        resources.srcDir file('src/cucumberTest/resources')
+    }
+}
+
+configurations {
+    cucumberTestCompile.extendsFrom testCompile
+    cucumberTestRuntime.extendsFrom testRuntime
 }
 
 dependencies {
@@ -39,12 +52,10 @@ dependencies {
     // Use annotations to define steps
     testCompile 'io.cucumber:cucumber-java:4.2.0'
     testCompile 'io.cucumber:cucumber-junit:4.2.0'
-}
 
-configurations {
-    cucumberRuntime {
-        extendsFrom testRuntime
-    }
+    cucumberTestCompile 'io.cucumber:cucumber-java:4.2.0'
+    cucumberTestCompile 'io.cucumber:cucumber-junit:4.2.0'
+
 }
 
 test {
@@ -56,29 +67,16 @@ test {
 
 // Cucumber stuff:
 
-sourceSets {
-    cucumberTest {
-        compileClasspath += sourceSets.main.output
-        runtimeClasspath += sourceSets.main.output
-    }
-}
+task cucumberTest(type: Test) {
 
-configurations {
-    cucumberTestImplementation.extendsFrom implementation
-    cucumberTestRuntimeOnly.extendsFrom runtimeOnly
-}
+    testClassesDirs = sourceSets.cucumberTest.output.classesDirs
+    classpath = sourceSets.cucumberTest.runtimeClasspath
 
-dependencies {
-    testCompile 'io.cucumber:cucumber-java:4.2.0'
-    testCompile 'io.cucumber:cucumber-junit:4.2.0'
-}
-
-task cucumberTest() {
     dependsOn assemble, compileTestJava
     doLast {
         javaexec {
             main = "cucumber.api.cli.Main"
-            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output + sourceSets.cucumberTest.output
+            classpath = configurations.cucumberTestRuntime + sourceSets.main.output + sourceSets.test.output
             args = ['--plugin', 'pretty', '--glue', 'stepdefs.hellocucumber', 'src/cucumberTest/resources']
         }
     }
