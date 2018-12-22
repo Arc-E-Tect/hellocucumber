@@ -12,6 +12,12 @@ class IsItFriday {
     }
 }
 
+class IsItSaturday {
+    static String isItSaturday(String today) {
+        return "Obviously NOT";
+    }
+}
+
 public class StepdefsForFriday {
     private String today;
     private String actualAnswer;
@@ -30,4 +36,15 @@ public class StepdefsForFriday {
     public void i_should_be_told(String expectedAnswer) {
         assertEquals(expectedAnswer, actualAnswer);
     }
+
+    @Given("today is Monday")
+    public void today_is_Monday() {
+        this.today = "Monday";
+    }
+
+    @When("I ask whether it's Saturday yet")
+    public void i_ask_whether_it_s_Saturday_yet() {
+        this.actualAnswer = IsItSaturday.isItSaturday(today);
+    }
+
 }

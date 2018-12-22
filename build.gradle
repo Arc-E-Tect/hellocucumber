@@ -63,6 +63,8 @@ test {
     testLogging {
         events "passed", "skipped", "failed"
     }
+    testLogging.showStandardStreams = true
+    systemProperties System.getProperties()
 }
 
 // Cucumber stuff:
@@ -72,12 +74,12 @@ task cucumberTest(type: Test) {
     testClassesDirs = sourceSets.cucumberTest.output.classesDirs
     classpath = sourceSets.cucumberTest.runtimeClasspath
 
-    dependsOn assemble, compileTestJava
+    dependsOn assemble
     doLast {
         javaexec {
             main = "cucumber.api.cli.Main"
-            classpath = configurations.cucumberTestRuntime + sourceSets.main.output + sourceSets.test.output
-            args = ['--plugin', 'pretty', '--glue', 'stepdefs.hellocucumber', 'src/cucumberTest/resources']
+            classpath = configurations.cucumberTestRuntime
+            args = ['--plugin', 'pretty', '--glue', 'src/cucumberTest/resources']
         }
     }
 }
